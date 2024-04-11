@@ -1,0 +1,43 @@
+version: '3'
+services:
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - C:\git\TracingTest\grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    restart: always
+    depends_on:
+      - otel-collector
+      - tempo
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - C:\git\TracingTest\otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - '4317:4317'
+      - '55680:55680'
+      - '55679:55679'
+    depends_on:
+      - tempo
+
+  tempo:
+    image: grafana/tempo:latest
+    ports:
+      - '3200:3200'
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - C:\git\TracingTest\tempo.yaml:/etc/tempo.yaml
+
+  nats:
+    image: nats:latest
+    ports:
+      - '4222:4222'
+    restart: always

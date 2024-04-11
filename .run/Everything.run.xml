@@ -1,0 +1,8 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Everything" type="CompoundRunConfigurationType">
+    <toRun name="ConsoleApp1" type="DotNetProject" />
+    <toRun name="WebApplication1" type="DotNetProject" />
+    <toRun name="Compose" type="docker-deploy" />
+    <method v="2" />
+  </configuration>
+</component>

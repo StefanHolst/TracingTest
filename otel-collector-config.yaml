@@ -1,0 +1,40 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  logging:
+    loglevel: info
+  otlp:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging, otlp]
+      processors: [tail_sampling]
+      
+processors:
+  # Data sources: traces, metrics, logs
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100
+    expected_new_traces_per_sec: 10
+    policies:
+      [
+        {
+          name: errors-policy,
+          type: status_code,
+          status_code: { status_codes: [ERROR] },
+        },
+        {
+          name: randomized-policy,
+          type: probabilistic,
+          probabilistic: { sampling_percentage: 25 },
+        },
+      ]
